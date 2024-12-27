@@ -1,6 +1,6 @@
 Hello API
 ## Dependencies
-- Go version 1.18
+- Go version 1.22.4
 ## Setup
 
 ### Install Go
