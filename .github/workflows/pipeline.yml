@@ -163,9 +163,9 @@ jobs:
           gcloud app describe || gcloud app create --region=us-central
       - name: Deploy App
         id: deploy
-        uses: google-github-actions/deploy-appengine@main
+        uses: 'google-github-actions/deploy-appengine@v1'
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           deliverables: "app.yaml"
       - id: test
-        run: curl "${{ steps.deploy.outputs.url }}/translate/hello"
+        run: curl "${{ steps.deploy.outputs.url }}/hello"

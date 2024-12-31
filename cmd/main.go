@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/jeffleon2/shipping-go-hello-api/handlers"
 	"github.com/jeffleon2/shipping-go-hello-api/handlers/rest"
 )
 
@@ -12,8 +13,8 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/translate/hello", rest.TranslateHandler)
 	mux.HandleFunc("/hello", rest.TranslateHandler)
+	mux.HandleFunc("/health", handlers.HealthCheck)
 
 	log.Printf("listening on %s\n", addr)
 	if err := http.ListenAndServe(addr, mux); err != nil {
