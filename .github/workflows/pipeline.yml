@@ -100,3 +100,38 @@ jobs:
           asset_path: api
           asset_name: api
           asset_content_type: application/octet-stream
+  deploy-function:
+    name: Deploy Faas
+    runs-on: ubuntu-latest
+    needs: Test
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: ls
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          version: '>= 363.0.0'
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
+      - name: 'Deploy to gen2 cloud function'
+        run:  |
+          gcloud functions deploy translate \
+          --gen2 \
+          --region=us-east1 \
+          --gen2 \
+          --runtime go122 \
+          --trigger-http \
+          --allow-unauthenticated \
+          --source=. \
+          --entry-point=Translate \
+      - id: test
+        run: curl "${{ steps.deploy.outputs.url }}/hello"
