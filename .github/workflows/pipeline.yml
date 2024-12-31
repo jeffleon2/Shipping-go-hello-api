@@ -158,6 +158,9 @@ jobs:
           version: '>= 363.0.0'
       - name: 'Use gcloud CLI'
         run: 'gcloud info'
+      - name: Initialize App Engine
+        run: |
+          gcloud app describe || gcloud app create --region=us-central
       - name: Deploy App
         id: deploy
         uses: google-github-actions/deploy-appengine@main
