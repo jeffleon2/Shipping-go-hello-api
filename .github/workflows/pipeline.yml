@@ -123,15 +123,17 @@ jobs:
       - name: 'Use gcloud CLI'
         run: 'gcloud info'
       - name: 'Deploy to gen2 cloud function'
+        id: deploy
         run:  |
-          gcloud functions deploy translate \
-          --gen2 \
-          --region=us-east1 \
-          --gen2 \
-          --runtime go122 \
-          --trigger-http \
-          --allow-unauthenticated \
-          --source=. \
-          --entry-point=Translate \
+          URL=$(gcloud functions deploy translate \
+            --gen2 \
+            --region=us-east1 \
+            --runtime go122 \
+            --trigger-http \
+            --allow-unauthenticated \
+            --source=. \
+            --entry-point=Translate \
+            --format="value(serviceConfig.uri)")
+          echo "::set-output name=url::$URL"
       - id: test
         run: curl "${{ steps.deploy.outputs.url }}/hello"
