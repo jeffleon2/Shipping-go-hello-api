@@ -137,3 +137,32 @@ jobs:
           echo "::set-output name=url::$URL"
       - id: test
         run: curl "${{ steps.deploy.outputs.url }}/hello"
+  deploy-paas:
+    name: Deploy Paas
+    runs-on: ubuntu-latest
+    needs: Test
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: ls
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          version: '>= 363.0.0'
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
+      - name: Deploy App
+        id: deploy
+        uses: google-github-actions/deploy-appengine@main
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          deliverables: "app.yaml"
+      - id: test
+        run: curl "${{ steps.deploy.outputs.url }}/translate/hello"
