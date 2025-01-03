@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/jeffleon2/shipping-go-hello-api/handlers"
 	"github.com/jeffleon2/shipping-go-hello-api/handlers/rest"
@@ -16,13 +17,19 @@ func main() {
 		addr = ":8080"
 	}
 
-	mux := http.NewServeMux()
+	server := &http.Server{
+		Addr:         addr,
+		Handler:      http.DefaultServeMux, // Puedes personalizar el handler aquí
+		ReadTimeout:  10 * time.Second,     // Máximo tiempo para leer la solicitud
+		WriteTimeout: 10 * time.Second,     // Máximo tiempo para escribir la respuesta
+		IdleTimeout:  120 * time.Second,
+	}
 
-	mux.HandleFunc("/hello", rest.TranslateHandler)
-	mux.HandleFunc("/health", handlers.HealthCheck)
+	http.HandleFunc("/hello", rest.TranslateHandler)
+	http.HandleFunc("/health", handlers.HealthCheck)
 
 	log.Printf("listening on %s\n", addr)
-	if err := http.ListenAndServe(addr, mux); err != nil {
+	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
 }
