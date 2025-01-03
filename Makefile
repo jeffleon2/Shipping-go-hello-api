@@ -2,7 +2,8 @@ GO_VERSION := 1.22.4
 
 .PHONY: setup build install-go init-go
 
-setup: install-go init-go
+setup: install-go init-go install-lint
+setup: install-go init-go install-lint
 
 build:
 	go build -o api cmd/main.go
@@ -19,6 +20,13 @@ report:
 
 check-format:
 	test -z $$(go fmt ./...)
+
+install-lint:
+	sudo curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sudo sh -s -- -b $(go env GOPATH)/bin v1.63.3
+
+static-check:
+	golangci-lint run
+
 
 # TODO: Add MacOS support
 install-go:
