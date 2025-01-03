@@ -1,3 +1,4 @@
+// Package faas wrapper for cloud functions.
 package faas
 
 import (

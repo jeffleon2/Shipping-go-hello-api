@@ -1,3 +1,4 @@
+// Package translation provides utilities for translate words.
 package translation
 
 import "strings"
