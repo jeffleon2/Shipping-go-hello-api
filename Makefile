@@ -11,6 +11,10 @@ build:
 test:
 	go test ./... -coverprofile=coverage.out
 
+copy-hooks:
+	chmod +x scripts/hooks/*
+	cp -r scripts/hooks .git/.
+
 coverage:
 	go tool cover -func coverage.out | grep "total:" | \
 	awk '{print ((int($$3) > 80) != 1) }'
