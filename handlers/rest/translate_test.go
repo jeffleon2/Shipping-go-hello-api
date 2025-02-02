@@ -9,6 +9,15 @@ import (
 	"github.com/jeffleon2/shipping-go-hello-api/handlers/rest"
 )
 
+type stubbedService struct{}
+
+func (s *stubbedService) Translate(word string, language string) string {
+	if word == "foo" {
+		return "bar"
+	}
+	return ""
+}
+
 func TestTranslateAPI(t *testing.T) {
 	tt := []struct {
 		Endpoint            string
@@ -34,9 +43,16 @@ func TestTranslateAPI(t *testing.T) {
 			ExpectedLanguage:    "",
 			ExpectedTranslation: "",
 		},
+		{
+			Endpoint:            "/translate/foo?language=GerMan",
+			StatusCode:          http.StatusOK,
+			ExpectedLanguage:    "german",
+			ExpectedTranslation: "bar",
+		},
 	}
 
-	handler := http.HandlerFunc(rest.TranslateHandler)
+	underTest := rest.NewTranslateHandler(&stubbedService{})
+	handler := http.HandlerFunc(underTest.TranslateHandler)
 
 	for _, test := range tt {
 		rr := httptest.NewRecorder()
