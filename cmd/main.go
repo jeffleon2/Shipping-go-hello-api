@@ -9,6 +9,7 @@ import (
 
 	"github.com/jeffleon2/shipping-go-hello-api/handlers"
 	"github.com/jeffleon2/shipping-go-hello-api/handlers/rest"
+	"github.com/jeffleon2/shipping-go-hello-api/translation"
 )
 
 func main() {
@@ -25,7 +26,9 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 	}
 
-	http.HandleFunc("/hello", rest.TranslateHandler)
+	translationService := translation.NewStaticService()
+	translationHandler := rest.NewTranslateHandler(translationService)
+	http.HandleFunc("/hello", translationHandler.TranslateHandler)
 	http.HandleFunc("/health", handlers.HealthCheck)
 
 	log.Printf("listening on %s\n", addr)

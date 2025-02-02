@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
-
-	"github.com/jeffleon2/shipping-go-hello-api/translation"
 )
 
 const defaultLanguage = "english"
@@ -15,7 +13,24 @@ type Resp struct {
 	Translation string `json:"translation"`
 }
 
-func TranslateHandler(w http.ResponseWriter, r *http.Request) {
+type Translator interface {
+	Translate(word string, language string) string
+}
+
+// TranslateHandler will translate calls for caller.
+type Translatehandler struct {
+	service Translator
+}
+
+// NewTranslateHandler will create a new instance of the handler using a
+// translation service.
+func NewTranslateHandler(service Translator) *Translatehandler {
+	return &Translatehandler{
+		service: service,
+	}
+}
+
+func (t *Translatehandler) TranslateHandler(w http.ResponseWriter, r *http.Request) {
 	enc := json.NewEncoder(w)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
@@ -24,7 +39,7 @@ func TranslateHandler(w http.ResponseWriter, r *http.Request) {
 		language = defaultLanguage
 	}
 	word := strings.ReplaceAll(r.URL.Path, "/", "")
-	translation := translation.Translate(word, language)
+	translation := t.service.Translate(word, language)
 	if translation == "" {
 		w.WriteHeader(http.StatusNotFound)
 		return
